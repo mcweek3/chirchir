@@ -1,35 +1,73 @@
 package com.example.rec;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ListActivity {
+	
+	public ProgressBar pb;
+	public Button record;
+	public Button stop;
+	public MediaRecorder mediaRecorder = new MediaRecorder();
+	public EditText edit_title;
+	
+	private static final String MEDIA_PATH = new String("/storage/emulated/0/test/"); // ROOT 경로를 지정합니다.     
+	private List<String> songs = new ArrayList<String>();     
+	private MediaPlayer mp = new MediaPlayer(); 
+	public int Position = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		final MediaRecorder mediaRecorder = new MediaRecorder();
+
+		pb = (ProgressBar) findViewById(R.id.progressBar);
+		pb.setVisibility(ProgressBar.GONE);
+		edit_title = (EditText) findViewById(R.id.title);
+		edit_title.setHint("제목을 입력하세요");
+		record = (Button) findViewById(R.id.record);
+		stop = (Button) findViewById(R.id.stop);
+		stop.setVisibility(View.GONE);
 		
+		updateSongList(); 
 		
-		Button record = (Button) findViewById(R.id.record);
 		record.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
 				try{
+					pb.setVisibility(ProgressBar.VISIBLE);
+					stop.setVisibility(View.VISIBLE);
+					record.setVisibility(View.GONE);
+					startProgressBarThread();
+					Editable title = edit_title.getText();
 					mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 					mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 					mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-					mediaRecorder.setOutputFile("/storage/emulated/0/Download/record.mp4");
+					mediaRecorder.setOutputFile("/storage/emulated/0/test/" + title + ".mp4");
 					mediaRecorder.prepare();
 					mediaRecorder.start();
 					Toast.makeText(MainActivity.this, "녹음을 시작합니다", Toast.LENGTH_SHORT).show();
@@ -39,15 +77,170 @@ public class MainActivity extends Activity {
 				}
 				
 			}});
+
 		
-		Button stop = (Button) findViewById(R.id.stop);
+
+
 		stop.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
+				Toast.makeText(MainActivity.this, "녹음을 정지합니다", Toast.LENGTH_SHORT).show();
+				pb.setVisibility(ProgressBar.GONE);
+				stop.setVisibility(View.GONE);
+				record.setVisibility(View.VISIBLE);
+				stopProgressBarThread();
 				mediaRecorder.stop();
-				mediaRecorder.release();
+				updateSongList(); 
+				//mediaRecorder.release();
 				//mediaRecorder = null;
 			}});
 	}
+	
+	public ProgressBar songProgressBar;
+	
+	public void updateSongList() {    
+		File home = new File(MEDIA_PATH); // home으로 sd카드의 root를 지정합니다.     
+		if (home.listFiles(new Mp3Filter()).length > 0) {         
+			for (File file : home.listFiles(new Mp3Filter())) {             
+				if(!songs.contains(file.getName()))
+					songs.add(file.getName()); // 재생목록 리스트에 파일 이름을 추가합니다.         
+				}        
+				ArrayAdapter<String> songList = new ArrayAdapter<String>(this, R.layout.song_item,R.id.song_item_text, songs); // ListView의 레이아웃 및 참조할 리스트를 설정합니다. 
+				setListAdapter(songList); // ListView와 ArrayList를 연결합니다.               
+				
+				} 
+		}
+	
+    public void myPlayHandler(View v) 
+    {
+          
+        //reset all the listView items background colours 
+        //before we set the clicked one..
+
+        ListView lvItems = getListView();
+        
+        //get the row the clicked button is in
+        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
+         
+        TextView child = (TextView)vwParentRow.getChildAt(0);
+        ProgressBar pro = (ProgressBar)vwParentRow.getChildAt(1);
+        int index = songs.indexOf(child.getText());
+       // Position = index;
+        playSong(v, MEDIA_PATH + songs.get(index));
+        pro.setTag(index + "");
+        
+        
+    }
+
+	
+// 	List 아이템을 클릭했을 때의 event를 처리합니다.     
+//	protected void onListItemClick(ListView l, View v, int position, long id) {         
+//		Position = position;         
+//		playSong(MEDIA_PATH + songs.get(position));     
+//		}
+	
+	private void playSong(View v, String songPath) {         
+		try {                  
+			
+	        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
+	        songProgressBar = (ProgressBar)vwParentRow.getChildAt(1);
+	        mp.reset();             
+			mp.setDataSource(songPath);             
+			mp.prepare();             
+			mp.start();
+            songProgressBar.setProgress(50);
+            songProgressBar.setMax(100);
+            //updateProgressBar();
+			Toast.makeText(this, "재생 : " + songPath, Toast.LENGTH_SHORT).show();             
+			TextView status = (TextView)findViewById(R.id.playStatus);             
+			status.setText("재생중 : " + songPath);                  
+			// 한 곡의 재생이 끝나면 다음 곡을 재생하도록 합니다.             
+			mp.setOnCompletionListener(new OnCompletionListener() {                      
+				public void onCompletion(MediaPlayer arg0) {                     
+					nextSong();                 
+					}                  
+				});              
+			} catch (IOException e) {             
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();         
+				}    
+		}
+	
+	private void nextSong() {         
+		if (++Position >= songs.size()) {             
+			// 마지막 곡이 끝나면, 재생할 곡을 초기화합니다.             
+			Position = 0;             
+			TextView status = (TextView)findViewById(R.id.playStatus);             
+			status.setText("준비됨");         
+			} else {             
+				// 다음 곡을 재생합니다.             
+				Toast.makeText(getApplicationContext(), "다음 곡을 재생합니다.", Toast.LENGTH_SHORT).show();             
+				//playSong(MEDIA_PATH + songs.get(Position));         
+				}     
+		} 
+
+	
+	private volatile Thread theProgressBarThread1;
+	public int CurrentPosition = 0;
+	
+	public synchronized void startProgressBarThread() {
+		if( theProgressBarThread1 == null)	{
+			theProgressBarThread1 = new Thread(null, backgroundThread1,"startProgressBarThread");
+			CurrentPosition = 0;
+			theProgressBarThread1.start();
+		}
+	}
+	public synchronized void stopProgressBarThread() {
+		if( theProgressBarThread1 != null)	{
+			Thread tmpThread = theProgressBarThread1;
+			theProgressBarThread1 = null;
+			tmpThread.interrupt();
+		}
+		pb.setVisibility(ProgressBar.GONE);
+	}
+	
+	private Runnable backgroundThread1 = new Runnable() {
+
+		@Override
+		public void run() {
+			if (Thread.currentThread() == theProgressBarThread1) {
+				CurrentPosition = 0;
+				final int total = 100;
+				while (CurrentPosition < total){
+					try{
+						progressBarHandle.sendMessage(progressBarHandle.obtainMessage());
+						Thread.sleep(100);
+					}
+					catch (final InterruptedException e){
+						return;
+					}
+					catch (final Exception e){
+						return;
+					}
+
+				}
+			}
+			
+		}
+		
+		Handler progressBarHandle = new Handler() {
+			
+			public void handleMessage(Message msg){
+				CurrentPosition++;
+				pb.setProgress(CurrentPosition);
+				if(CurrentPosition == 100){
+					Toast.makeText(MainActivity.this, "녹음을 정지합니다", Toast.LENGTH_SHORT).show();
+					pb.setVisibility(ProgressBar.GONE);
+					stop.setVisibility(View.GONE);
+					record.setVisibility(View.VISIBLE);
+					mediaRecorder.stop();
+					updateSongList(); 
+					stopProgressBarThread();
+				}
+			}
+		};
+	};
+	
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
