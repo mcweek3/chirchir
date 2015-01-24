@@ -1,14 +1,28 @@
 package com.example.rec;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
 import android.app.ListActivity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -142,19 +156,18 @@ public class MainActivity extends ListActivity  {
 	}
 	
 	public void myLikeHandler(View v) {
-		Log.e("like","like");
-
 		ListView lvItems = getListView();
 
 		// get the row the clicked button is in
 		RelativeLayout vwParentRow = (RelativeLayout) v.getParent();
-		Log.e("like","like2");
 		TextView child = (TextView) vwParentRow.getChildAt(0);
 		ImageButton likeButton = (ImageButton) vwParentRow.getChildAt(3);
 		
 		int index = songs.indexOf(child.getText());
 		// Position = index;
-		Toast.makeText(this, index + "",Toast.LENGTH_SHORT).show();
+		
+		like();
+		//Toast.makeText(this, index + "",Toast.LENGTH_SHORT).show();
 	}
 
 	// List 아이템을 클릭했을 때의 event를 처리합니다.
@@ -260,48 +273,11 @@ public class MainActivity extends ListActivity  {
 			long totalDuration = mp.getDuration();
 			long currentDuration = mp.getCurrentPosition();
 
-			// Displaying Total Duration time
-			// songTotalDurationLabel.setText(""+utils.milliSecondsToTimer(totalDuration));
-			// Displaying time completed playing
-			// songCurrentDurationLabel.setText(""+utils.milliSecondsToTimer(currentDuration));
-			// / Log.d("currentDuration", ""+currentDuration);
-			// Log.d("totalDuration", ""+totalDuration);
 			// Updating progress bar
 			int progress = (int) ((float) currentDuration / totalDuration * 100);
 			float progress_float = (float) ((float) currentDuration / totalDuration * 100);
 			Log.d("Progress", "" + progress);
 			songProgressBar.setProgress((int) progress);
-			
-//			songProgressBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
-//				@Override
-//				public void onProgressChanged(SeekBar seekBar, int progress,
-//						boolean fromUser) {
-//					// TODO Auto-generated method stub
-//				}
-//
-//				@Override
-//				public void onStartTrackingTouch(SeekBar seekBar) {
-//					// TODO Auto-generated method stub
-//					mHandler.removeCallbacks(mUpdateTimeTask);
-//					Log.e("removeCallback","removeCallback");
-//				}
-//
-//				@Override
-//				public void onStopTrackingTouch(SeekBar seekBar) {
-//					// TODO Auto-generated method stub
-//					mHandler.removeCallbacks(mUpdateTimeTask);
-//					int totalDuration = mp.getDuration();
-//					int currentPosition = (int) (((float) seekBar.getProgress() / 100) * totalDuration);
-//
-//					// forward or backward to certain seconds
-//					mp.seekTo(currentPosition);
-//
-//					// update timer progress again
-//					updateProgressBar();
-//
-//				}
-//						
-//			});
 
 			// Running this thread after 100 milliseconds
 			if (currentDuration != totalDuration - 20)
@@ -374,6 +350,68 @@ public class MainActivity extends ListActivity  {
 		};
 	};
 
+	
+	 private void like() {
+	      new ProcessLikeTask().execute(null, null, null);
+	   }
+
+	   // AsyncTask<Params,Progress,Result>
+	   private class ProcessLikeTask extends AsyncTask<Void, Void, Void> {
+	      HttpResponse response = null;
+	      @Override
+	      protected Void doInBackground(Void... params) {
+	            HttpClient httpClient = new DefaultHttpClient();
+	            String urlString = "http://54.65.81.18:8080/like";
+	            HttpPost httpPost = new HttpPost(urlString);
+	   
+	            try {
+	               List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+	               nameValuePairs.add(new BasicNameValuePair("id", "2"));
+	               httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+	   
+	               // Execute HTTP Post Request
+	               response = httpClient.execute(httpPost);
+	            } catch (ClientProtocolException e) {
+	            } catch (IOException e) {
+	            }
+	         return null;
+	      }
+	      
+	    protected void onPostExecute(Void result) {
+	          // TODO Auto-generated method stub
+	          super.onPostExecute(result);
+	          
+	          HttpEntity entity = response.getEntity();
+	          StringBuilder sb = new StringBuilder();
+	          try {
+	              BufferedReader reader = 
+	                     new BufferedReader(new InputStreamReader(entity.getContent()), 65728);
+	              String line = null;
+
+	              while ((line = reader.readLine()) != null) {
+	                  sb.append(line);
+	              }
+	          }
+	          catch (IOException e) { e.printStackTrace(); }
+	          catch (Exception e) { e.printStackTrace(); }
+
+	          
+	          String res_str = sb.toString();
+	          System.out.println(res_str);
+	          if (!res_str.equals("nothing")) {
+	             String text = "Like, " + res_str;
+	             Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+	          } else {
+	             Toast.makeText(getApplicationContext(), "Wrong Credentials",
+	                   Toast.LENGTH_SHORT).show();
+	          }
+	          
+	       }
+	      	      
+	   }
+
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
