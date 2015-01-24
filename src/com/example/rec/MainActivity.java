@@ -21,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -127,9 +128,6 @@ public class MainActivity extends ListActivity  {
 
 	public void myPlayHandler(View v) {
 
-		// reset all the listView items background colours
-		// before we set the clicked one..
-
 		ListView lvItems = getListView();
 
 		// get the row the clicked button is in
@@ -140,8 +138,23 @@ public class MainActivity extends ListActivity  {
 		int index = songs.indexOf(child.getText());
 		// Position = index;
 		playSong(v, MEDIA_PATH + songs.get(index));
-		pro.setTag(index + "");
 
+	}
+	
+	public void myLikeHandler(View v) {
+		Log.e("like","like");
+
+		ListView lvItems = getListView();
+
+		// get the row the clicked button is in
+		RelativeLayout vwParentRow = (RelativeLayout) v.getParent();
+		Log.e("like","like2");
+		TextView child = (TextView) vwParentRow.getChildAt(0);
+		ImageButton likeButton = (ImageButton) vwParentRow.getChildAt(3);
+		
+		int index = songs.indexOf(child.getText());
+		// Position = index;
+		Toast.makeText(this, index + "",Toast.LENGTH_SHORT).show();
 	}
 
 	// List 아이템을 클릭했을 때의 event를 처리합니다.
