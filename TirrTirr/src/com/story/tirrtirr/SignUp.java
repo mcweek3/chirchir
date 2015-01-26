@@ -3,6 +3,7 @@ package com.story.tirrtirr;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -26,28 +26,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class SignUp extends Activity{
-	
+public class SignUp extends Activity {
 	Button register = null;
 	private EditText username = null;
 	private EditText password = null;
+	private EditText nickname = null;
 	saveCookie pref = new saveCookie(this);
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.signup);
+		
 		register = (Button) findViewById(R.id.register); 
 		username = (EditText) findViewById(R.id.signupid);
 		password = (EditText) findViewById(R.id.signuppw);
-		
+		nickname = (EditText) findViewById(R.id.txt_nickname);
 		
 		register.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				System.out.println("∞°¿‘ ¡ﬂ");
-				if(username.getText().toString().length()<4 || password.getText().toString().length()<4) Toast.makeText(getApplicationContext(), "ID ∂«¥¬ æœ»£∞° ≥ π´ ¬™Ω¿¥œ¥Ÿ", Toast.LENGTH_SHORT).show();
+				if(username.getText().toString().length() < 4 || password.getText().toString().length() < 4 || nickname.getText().toString().length() < 2)
+					Toast.makeText(getApplicationContext(), "ÏùºÎ∂Ä ÏûÖÎ†•Ìï≠Î™©Ïù¥ ÎÑàÎ¨¥ ÏßßÏäµÎãàÎã§. ", Toast.LENGTH_SHORT).show();
 				else new ProcessSignupTask().execute(null,null,null);
 			}
 		});
@@ -55,20 +54,20 @@ public class SignUp extends Activity{
 	
 	private class ProcessSignupTask extends AsyncTask<Void, Void, Void> {
 		HttpResponse response = null;
+		
 		@Override
 		protected Void doInBackground(Void... params) {
-				
-	
 				HttpClient httpClient = new DefaultHttpClient();
 				String urlString = "http://54.65.81.18:9000/signup";
 				HttpPost httpPost = new HttpPost(urlString);
 	
 				try {
-					List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
-							2);
+					List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+
 					nameValuePairs.add(new BasicNameValuePair("id", username.getText().toString()));
-					nameValuePairs.add(new BasicNameValuePair("pwd",password.getText().toString()));
-					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+					nameValuePairs.add(new BasicNameValuePair("pwd", password.getText().toString()));
+					nameValuePairs.add(new BasicNameValuePair("nick", nickname.getText().toString()));
+					httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"utf-8"));
 	
 					// Execute HTTP Post Request
 					response = httpClient.execute(httpPost);
@@ -80,44 +79,39 @@ public class SignUp extends Activity{
 		
 	
 		protected void onPostExecute(Void result) {
-			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			
 			HttpEntity entity = response.getEntity();
 			StringBuilder sb = new StringBuilder();
+
 			try {
-			    BufferedReader reader = 
-			           new BufferedReader(new InputStreamReader(entity.getContent()), 65728);
+			    BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()), 65728);
 			    String line = null;
-
-			    while ((line = reader.readLine()) != null) {
+			    while ((line = reader.readLine()) != null)
 			        sb.append(line);
-			    }
 			}
-			catch (IOException e) { e.printStackTrace(); }
-			catch (Exception e) { e.printStackTrace(); }
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 
-
-			
 			String res_str = sb.toString();
-			System.out.println(res_str);
-			
 			
 			if (res_str.startsWith("welcome")) {
 				pref.put("id", username.getText().toString());
 				String text = "Hello, " + pref.getValue("id", null);
 				Toast.makeText(getApplicationContext(), text,
 						Toast.LENGTH_SHORT).show();
-				
 				SignUp.this.finish();
-
-			} else {
-				Toast.makeText(getApplicationContext(), "¡ﬂ∫πµ» ID¿‘¥œ¥Ÿ.",
+			} else if(res_str.equals("id")) {
+				Toast.makeText(getApplicationContext(), "Ï§ëÎ≥µÎêú ÏïÑÏù¥Îîî ÏûÖÎãàÎã§..",
+						Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(getApplicationContext(), "Ï§ëÎ≥µÎêú ÎãâÎÑ§ÏûÑ ÏûÖÎãàÎã§..",
 						Toast.LENGTH_SHORT).show();
 			}
-			
-			
 		}
-
 	}
 }

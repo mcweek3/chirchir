@@ -1,0 +1,99 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.story.tirrtirr.Category" >
+
+    <ImageButton
+        android:id="@+id/People"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Trash"
+        android:layout_centerVertical="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/people" />
+
+    <ImageButton
+        android:id="@+id/Music"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/Food"
+        android:layout_marginRight="63dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/music" />
+
+    <ImageButton
+        android:id="@+id/Movie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/Trash"
+        android:layout_marginRight="40dp"
+        android:layout_toLeftOf="@+id/People"
+        android:background="@android:color/transparent"
+        android:src="@drawable/movie" />
+
+    <ImageButton
+        android:id="@+id/Best"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Food"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="20dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/best" />
+
+    <ImageButton
+        android:id="@+id/Food"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Movie"
+        android:layout_below="@+id/Best"
+        android:background="@android:color/transparent"
+        android:src="@drawable/food" />
+
+    <ImageButton
+        android:id="@+id/Star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/Best"
+        android:layout_marginBottom="20dp"
+        android:layout_toRightOf="@+id/Movie"
+        android:background="@android:color/transparent"
+        android:src="@drawable/star" />
+
+    <ImageButton
+        android:id="@+id/Trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Music"
+        android:layout_below="@+id/People"
+        android:layout_marginTop="42dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/trash" />
+
+    <ImageButton
+        android:id="@+id/Love"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Movie"
+        android:layout_alignTop="@+id/Trash"
+        android:background="@android:color/transparent"
+        android:src="@drawable/love" />
+
+    <ImageButton
+        android:id="@+id/Profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/Trash"
+        android:layout_toRightOf="@+id/People"
+        android:background="@android:color/transparent"
+        android:src="@drawable/profile" />
+
+</RelativeLayout>

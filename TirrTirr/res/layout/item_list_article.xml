@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?><RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/song_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+	android:focusableInTouchMode="true" >
+
+    <ImageButton
+        android:id="@+id/btn_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/bar_audio"
+        android:layout_alignParentRight="true"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:onClick="onClick"
+        android:src="@drawable/play" />
+
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:clickable="true"
+        android:text="Author"
+        android:textSize="20sp" />
+
+    <SeekBar
+        android:id="@+id/bar_audio"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/author"
+        android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/btn_play"
+        android:layout_weight="3"
+        android:focusable="false" />
+
+    <TextView
+        android:id="@+id/txt_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btn_like"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/btn_play"
+        android:textSize="50px" />
+    
+    <ImageButton
+        android:id="@+id/btn_like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_play"
+        android:layout_toRightOf="@+id/txt_content"
+        android:background="@android:color/transparent"
+        android:onClick="onClick"
+        android:src="@drawable/like" />
+
+    <TextView
+        android:id="@+id/txt_like_count"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/author"
+        android:textSize="50px" />
+
+    <ListView
+        android:id="@+id/comment_list"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/btn_comment" >
+    </ListView>
+
+    <Button
+        android:id="@+id/btn_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/txt_comment"
+        android:onClick="onClick"
+        android:text="comment" />
+
+    <EditText
+        android:id="@+id/txt_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/txt_content"
+        android:layout_toLeftOf="@+id/btn_comment"
+        android:ems="10" >
+
+    </EditText>
+
+</RelativeLayout>

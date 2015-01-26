@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class saveCookie {
-	private final String PREF_NAME = "com.tirrtirr.pref";
+	private final String PREF_NAME = "com.story.tirrtirr.pref";
 	public final static String PREF_INTRO_USER_AGREEMENT = "PREF_USER_AGREEMENT";
 	public final static String PREF_MAIN_VALUE = "PREF_MAIN_VALUE";
 	static Context mContext;

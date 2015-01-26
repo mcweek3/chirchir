@@ -3,7 +3,12 @@
     package="com.story.tirrtirr"
     android:versionCode="1"
     android:versionName="1.0" >
-
+   
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="21" />
@@ -22,6 +27,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Main" />
+        <activity android:name=".Record" />
+        <activity android:name=".SignUp" />
+        <activity android:name=".MyPage" />
+        <activity android:name=".Category" />
+        <provider
+            android:name=".DataProvider"
+            android:authorities="com.story.tirrtirr.provider"
+            android:exported="false" >
+        </provider>
     </application>
 
 </manifest>

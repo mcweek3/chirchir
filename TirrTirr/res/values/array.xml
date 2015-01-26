@@ -1,0 +1,11 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<resources>
+ <string-array name="selected">
+        <item>음식</item>
+        <item>음악</item>
+        <item>영화</item>
+        <item>정치/사회</item>
+        <item>연애</item>
+        <item>와일드</item>
+    </string-array>
+</resources>
